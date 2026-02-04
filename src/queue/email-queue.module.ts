@@ -31,6 +31,9 @@ export interface EmailQueueModuleAsyncOptions {
 const EMAIL_QUEUE_OPTIONS = 'EMAIL_QUEUE_OPTIONS';
 
 @Module({})
+class EmailQueueOptionsModule {}
+
+@Module({})
 export class EmailQueueModule {
   static register(options: EmailQueueModuleOptions = {}): DynamicModule {
     const queueName = options.queueName ?? DEFAULT_EMAIL_QUEUE;
@@ -81,7 +84,7 @@ export class EmailQueueModule {
 
   static registerAsync(options: EmailQueueModuleAsyncOptions): DynamicModule {
     const optionsModule: DynamicModule = {
-      module: EmailQueueModule,
+      module: EmailQueueOptionsModule,
       imports: options.imports ?? [],
       providers: [
         {
