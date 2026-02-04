@@ -80,14 +80,22 @@ export class EmailQueueModule {
   }
 
   static registerAsync(options: EmailQueueModuleAsyncOptions): DynamicModule {
-    return {
+    const optionsModule: DynamicModule = {
       module: EmailQueueModule,
+      imports: options.imports ?? [],
       providers: [
         {
           provide: EMAIL_QUEUE_OPTIONS,
           useFactory: options.useFactory,
           inject: options.inject ?? [],
         },
+      ],
+      exports: [EMAIL_QUEUE_OPTIONS],
+    };
+
+    return {
+      module: EmailQueueModule,
+      providers: [
         {
           provide: EMAIL_QUEUE_NAME,
           useFactory: async (resolved: EmailQueueModuleOptions) =>
@@ -105,6 +113,7 @@ export class EmailQueueModule {
       ],
       imports: [
         ConfigModule,
+        optionsModule,
         ...(options.imports ?? []),
         BullModule.forRootAsync({
           imports: [ConfigModule],
@@ -125,6 +134,7 @@ export class EmailQueueModule {
           },
         }),
         BullModule.registerQueueAsync({
+          imports: [optionsModule],
           inject: [EMAIL_QUEUE_OPTIONS],
           useFactory: async (resolved: EmailQueueModuleOptions) => ({
             name: resolved.queueName ?? DEFAULT_EMAIL_QUEUE,
