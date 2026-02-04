@@ -25,7 +25,37 @@ import { Module } from "@nestjs/common";
 import { EmailModule, EmailQueueModule } from "nestmailq";
 
 @Module({
-	imports: [EmailModule, EmailQueueModule],
+	imports: [
+		EmailModule,
+		EmailQueueModule.register({
+			// optional overrides (defaults shown)
+			queueName: "email_queue",
+			sendJobName: "send-email",
+		}),
+	],
+})
+export class AppModule {}
+```
+
+Async configuration:
+
+```ts
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { EmailModule, EmailQueueModule } from "nestmailq";
+
+@Module({
+	imports: [
+		ConfigModule.forRoot({ isGlobal: true }),
+		EmailModule,
+		EmailQueueModule.registerAsync({
+			inject: [ConfigService],
+			useFactory: (config: ConfigService) => ({
+				queueName: config.get("EMAIL_QUEUE_NAME", "email_queue"),
+				sendJobName: config.get("EMAIL_JOB_SEND_NAME", "send-email"),
+			}),
+		}),
+	],
 })
 export class AppModule {}
 ```
@@ -70,6 +100,8 @@ Place Handlebars templates under `templates/` (shipped with the package). The de
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`
 - `SES_REGION`, `SES_ACCESS_KEY_ID`, `SES_SECRET_ACCESS_KEY`
 - `REDIS_URL`
+- `EMAIL_QUEUE_NAME` (optional)
+- `EMAIL_JOB_SEND_NAME` (optional)
 
 ## License
 
