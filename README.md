@@ -37,28 +37,6 @@ import { EmailModule, EmailQueueModule } from "nestmailq";
 export class AppModule {}
 ```
 
-Async configuration:
-
-```ts
-import { Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
-import { EmailModule, EmailQueueModule } from "nestmailq";
-
-@Module({
-	imports: [
-		ConfigModule.forRoot({ isGlobal: true }),
-		EmailModule,
-		EmailQueueModule.registerAsync({
-			inject: [ConfigService],
-			useFactory: (config: ConfigService) => ({
-				queueName: config.get("EMAIL_QUEUE_NAME", "email_queue"),
-				sendJobName: config.get("EMAIL_JOB_SEND_NAME", "send-email"),
-			}),
-		}),
-	],
-})
-export class AppModule {}
-```
 
 Queue a message:
 
